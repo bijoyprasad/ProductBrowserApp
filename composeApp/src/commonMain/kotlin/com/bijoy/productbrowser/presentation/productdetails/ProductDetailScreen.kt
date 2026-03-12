@@ -19,6 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
@@ -144,9 +146,11 @@ private fun ProductDetailContent(
                         .padding(4.dp)
                 ) {
                     repeat(product.rating.roundToInt()) {
-                        Text(
-                            text = "⭐",
-                            style = MaterialTheme.typography.bodySmall
+                        Icon(
+                            imageVector = Icons.Filled.Star,
+                            contentDescription = null,
+                            tint = Color(0xFFFFB300),
+                            modifier = Modifier.size(12.dp)
                         )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
@@ -401,7 +405,12 @@ private fun ReviewCard(review: Review) {
                 }
                 Row {
                     repeat(review.rating) {
-                        Text(text = "⭐", style = MaterialTheme.typography.labelSmall)
+                        Icon(
+                            imageVector = Icons.Filled.Star,
+                            contentDescription = null,
+                            tint = Color(0xFFFFB300),
+                            modifier = Modifier.size(12.dp)
+                        )
                     }
                 }
             }

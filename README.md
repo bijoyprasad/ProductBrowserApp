@@ -8,7 +8,7 @@ A Kotlin Multiplatform (KMP) app that lets users browse, search, and inspect pro
 
 | # | Requirement |
 |---|-------------|
-| 1 | Display a paginated / scrollable list of products fetched from the remote API. |
+| 1 | Display a scrollable list of products fetched from the remote API. |
 | 2 | Allow users to search for products by keyword (delegated to the API's search endpoint). |
 | 3 | Allow users to filter products by category using chip selectors. |
 | 4 | Tapping a product opens a detail screen showing full information: images, price (with discount), rating, stock status, tags, product specs, and user reviews. |

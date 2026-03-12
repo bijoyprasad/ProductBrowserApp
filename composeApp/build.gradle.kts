@@ -59,6 +59,15 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
     }
+
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.8.0")
+            force("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+            force("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
+            force("org.jetbrains.androidx.lifecycle:lifecycle-common:2.8.0")
+        }
+    }
 }
 
 android {
