@@ -27,7 +27,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.bijoy.productbrowser.domain.model.Product
@@ -148,36 +147,5 @@ fun ProductCard(
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun ProductCardPreview() {
-    val sampleProduct = Product(
-        id = 1,
-        title = "iPhone 15 Pro Max",
-        description = "Latest Apple flagship smartphone with titanium design",
-        category = "smartphones",
-        price = 1299.99,
-        discountPercentage = 10.5,
-        rating = 4.8,
-        stock = 50,
-        tags = listOf("apple", "iphone"),
-        brand = "Apple",
-        sku = "IPHONE15PM",
-        weight = 0.2,
-        dimensions = null,
-        warrantyInformation = "1 year warranty",
-        shippingInformation = "Ships in 1-2 days",
-        availabilityStatus = "In Stock",
-        reviews = emptyList(),
-        returnPolicy = "30 days return",
-        minimumOrderQuantity = 1,
-        images = emptyList(),
-        thumbnail = "https://cdn.dummyjson.com/products/images/smartphones/iPhone_15_Pro_Max/thumbnail.png"
-    )
-    MaterialTheme {
-        ProductCard(product = sampleProduct, onClick = {})
     }
 }

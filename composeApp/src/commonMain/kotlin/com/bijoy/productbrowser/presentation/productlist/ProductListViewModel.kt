@@ -34,19 +34,7 @@ class ProductListViewModel(
         observeSearchQuery()
     }
 
-    private fun observeSearchQuery() {
-        _searchQuery
-            .debounce(400L)
-            .distinctUntilChanged()
-            .onEach { query ->
-                if (query.length >= 2) {
-                    searchProducts(query)
-                } else if (query.isEmpty()) {
-                    _state.update { it.copy(searchResults = emptyList(), isSearchActive = false) }
-                }
-            }
-            .launchIn(viewModelScope)
-    }
+    // ── Data loading ──────────────────────────────────────────────────────
 
     fun loadProducts() {
         viewModelScope.launch {
@@ -61,6 +49,22 @@ class ProductListViewModel(
                 is Resource.Loading -> Unit
             }
         }
+    }
+
+    // ── Search ────────────────────────────────────────────────────────────
+
+    private fun observeSearchQuery() {
+        _searchQuery
+            .debounce(400L)
+            .distinctUntilChanged()
+            .onEach { query ->
+                if (query.length >= 2) {
+                    searchProducts(query)
+                } else if (query.isEmpty()) {
+                    _state.update { it.copy(searchResults = emptyList(), isSearchActive = false) }
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun onSearchQueryChange(query: String) {
@@ -93,5 +97,18 @@ class ProductListViewModel(
                 is Resource.Loading -> Unit
             }
         }
+    }
+
+    // ── Category filter (pure local, no API) ──────────────────────────────
+
+    fun selectCategory(category: String) {
+        // Tapping the already-selected chip deselects it (toggle behaviour)
+        _state.update {
+            it.copy(selectedCategory = if (it.selectedCategory == category) null else category)
+        }
+    }
+
+    fun clearCategory() {
+        _state.update { it.copy(selectedCategory = null) }
     }
 }

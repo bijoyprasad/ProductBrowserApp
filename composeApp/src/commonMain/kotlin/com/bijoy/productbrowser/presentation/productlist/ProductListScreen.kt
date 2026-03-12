@@ -1,17 +1,20 @@
 package com.bijoy.productbrowser.presentation.productlist
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -22,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bijoy.productbrowser.presentation.ui.EmptyView
 import com.bijoy.productbrowser.presentation.ui.ErrorView
@@ -41,7 +43,7 @@ fun ProductListScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            LargeTopAppBar(
+            MediumTopAppBar(
                 title = {
                     Text(
                         text = "Products",
@@ -61,36 +63,80 @@ fun ProductListScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-//            SearchBar(
-//                query = state.searchQuery,
-//                onQueryChange = viewModel::onSearchQueryChange,
-//                onClear = viewModel::clearSearch,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(horizontal = 16.dp, vertical = 8.dp)
-//            )
+            // ── Search bar ───────────────────────────────────────────────
+            SearchBar(
+                query = state.searchQuery,
+                onQueryChange = viewModel::onSearchQueryChange,
+                onClear = viewModel::clearSearch,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
 
+            // ── Category filter chips (hidden during initial load) ─────────
+            AnimatedVisibility(
+                visible = !state.isLoading && state.availableCategories.isNotEmpty(),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                CategoryFilterRow(
+                    categories = state.availableCategories,
+                    selectedCategory = state.selectedCategory,
+                    onCategorySelected = { category ->
+                        if (category == null) viewModel.clearCategory()
+                        else viewModel.selectCategory(category)
+                    }
+                )
+            }
+
+            // ── Result count label (search active) ────────────────────────
+            AnimatedVisibility(
+                visible = state.isSearchActive && state.displayedProducts.isNotEmpty(),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                val count = state.displayedProducts.size
+                val categoryNote = state.selectedCategory?.let { " in \"$it\"" } ?: ""
+                Text(
+                    text = "$count result${if (count != 1) "s" else ""} for \"${state.searchQuery}\"$categoryNote",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+            }
+
+            // ── Content states ────────────────────────────────────────────
             when {
+                // Initial load spinner
                 state.isLoading -> LoadingView()
+
+                // API error (only when not searching)
                 state.error != null && !state.isSearchActive -> ErrorView(
                     message = state.error!!,
                     onRetry = viewModel::loadProducts
                 )
-                state.isSearchLoading -> LoadingView()
-                state.displayedProducts.isEmpty() && state.isSearchActive -> EmptyView(
-                    message = "No results for \"${state.searchQuery}\""
-                )
-                state.displayedProducts.isEmpty() -> EmptyView()
-                else -> {
-                    AnimatedVisibility(visible = state.isSearchActive && state.displayedProducts.isNotEmpty()) {
-                        Text(
-                            text = "${state.displayedProducts.size} results for \"${state.searchQuery}\"",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                        )
-                    }
 
+                // Search in-flight spinner
+                state.isSearchLoading -> LoadingView()
+
+                // Search + optional category returned nothing
+                state.displayedProducts.isEmpty() && state.isSearchActive -> {
+                    val msg = buildString {
+                        append("No results for \"${state.searchQuery}\"")
+                        state.selectedCategory?.let { append(" in category \"$it\"") }
+                    }
+                    EmptyView(message = msg)
+                }
+
+                // Category filter alone returned nothing
+                state.displayedProducts.isEmpty() && state.selectedCategory != null ->
+                    EmptyView(message = "No products in \"${state.selectedCategory}\"")
+
+                // Nothing loaded at all
+                state.displayedProducts.isEmpty() -> EmptyView()
+
+                // Happy path — staggered product grid
+                else -> {
                     LazyVerticalStaggeredGrid(
                         columns = StaggeredGridCells.Adaptive(160.dp),
                         contentPadding = PaddingValues(8.dp),
@@ -107,13 +153,5 @@ fun ProductListScreen(
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun ProductListScreenPreview() {
-    MaterialTheme {
-        Text("Product List Screen Preview")
     }
 }

@@ -44,7 +44,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.bijoy.productbrowser.domain.model.Product
@@ -413,16 +412,5 @@ private fun ReviewCard(review: Review) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    }
-}
-
-@Preview
-@Composable
-fun ProductDetailScreenPreview() {
-    MaterialTheme {
-        ProductDetailScreen(
-            onBack = {},
-           productId = 1
-        )
     }
 }
