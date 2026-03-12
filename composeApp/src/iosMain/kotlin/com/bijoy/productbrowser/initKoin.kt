@@ -3,6 +3,7 @@ package com.bijoy.productbrowser
 import com.bijoy.productbrowser.data.di.networkModule
 import com.bijoy.productbrowser.data.di.repositoryModule
 import com.bijoy.productbrowser.data.di.useCaseModule
+import com.bijoy.productbrowser.data.di.viewModelModule
 import org.koin.core.context.startKoin
 
 fun initKoin() {
@@ -10,7 +11,8 @@ fun initKoin() {
         modules(
             networkModule,
             repositoryModule,
-            useCaseModule
+            useCaseModule,
+            viewModelModule
         )
     }
 }

@@ -20,10 +20,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -44,20 +46,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.bijoy.productbrowser.domain.model.Product
 import com.bijoy.productbrowser.domain.model.Review
 import com.bijoy.productbrowser.presentation.ui.ErrorView
 import com.bijoy.productbrowser.presentation.ui.LoadingView
+import com.bijoy.productbrowser.presentation.util.toPrice
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import productbrowserapp.composeapp.generated.resources.Res
+import productbrowserapp.composeapp.generated.resources.outline_arrow_back_24
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailScreen(
+    onBack: () -> Unit,
     productId: Int,
-    navController: NavController,
     viewModel: ProductDetailViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -78,8 +83,11 @@ fun ProductDetailScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Text("←", style = MaterialTheme.typography.titleLarge)
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            painter = painterResource(Res.drawable.outline_arrow_back_24),
+                            contentDescription = "Back"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -115,20 +123,48 @@ private fun ProductDetailContent(
             .verticalScroll(rememberScrollState())
     ) {
         // Product Image
-        AsyncImage(
-            model = product.thumbnail,
-            contentDescription = product.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1.8f)
-        )
+        Box{
+            AsyncImage(
+                model = product.thumbnail,
+                contentDescription = product.title,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+            )
+            Badge(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                containerColor = MaterialTheme.colorScheme.secondary
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .padding(4.dp)
+                ) {
+                    repeat(product.rating.roundToInt()) {
+                        Text(
+                            text = "⭐",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = product.rating.roundToInt().toString(),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
 
+            }
+        }
         Column(modifier = Modifier.padding(16.dp)) {
             // Category & Brand
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
@@ -141,45 +177,6 @@ private fun ProductDetailContent(
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                    )
-                }
-                product.brand?.let { brand ->
-                    Text(
-                        text = brand,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Title
-            Text(
-                text = product.title,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.ExtraBold
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Rating & Stock
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    repeat(5) { index ->
-                        Text(
-                            text = if (index < product.rating.roundToInt()) "⭐" else "☆",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = product.rating.toString(),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.SemiBold
                     )
                 }
                 Surface(
@@ -199,32 +196,49 @@ private fun ProductDetailContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Title
+            Text(
+                text = product.title,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.ExtraBold
+            )
+
+            product.brand?.let { brand ->
+                Text(
+                    text = brand,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Price
             Row(
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
-                    text = product.discountedPrice.toString(),
+                    text = product.discountedPrice.toPrice(),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.error
                 )
                 if (product.discountPercentage > 0) {
                     Text(
-                        text = product.price.toString(),
+                        text = product.price.toPrice(),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textDecoration = TextDecoration.LineThrough
                     )
                     Surface(
                         shape = RoundedCornerShape(4.dp),
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.tertiary
                     ) {
                         Text(
-                            text = "-${product.discountPercentage.roundToInt()}%",
+                            text = "${product.discountPercentage.roundToInt()}% off",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onError,
                             fontWeight = FontWeight.Bold,
@@ -406,6 +420,9 @@ private fun ReviewCard(review: Review) {
 @Composable
 fun ProductDetailScreenPreview() {
     MaterialTheme {
-        Text("Product Detail Screen Preview")
+        ProductDetailScreen(
+            onBack = {},
+           productId = 1
+        )
     }
 }

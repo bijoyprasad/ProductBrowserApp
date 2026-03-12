@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +24,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.bijoy.productbrowser.presentation.ui.EmptyView
 import com.bijoy.productbrowser.presentation.ui.ErrorView
 import com.bijoy.productbrowser.presentation.ui.LoadingView
@@ -33,7 +32,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductListScreen(
-    navController: NavController,
+    onItemClick: (Int) -> Unit = {},
     viewModel: ProductListViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -92,18 +91,16 @@ fun ProductListScreen(
                         )
                     }
 
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 160.dp),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    LazyVerticalStaggeredGrid(
+                        columns = StaggeredGridCells.Adaptive(160.dp),
+                        contentPadding = PaddingValues(8.dp),
+                        verticalItemSpacing = 8.dp,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(state.displayedProducts, key = { it.id }) { product ->
                             ProductCard(
                                 product = product,
-                                onClick = {
-                                    navController.navigate(Routes.productDetail(product.id))
-                                }
+                                onClick = { onItemClick(product.id) }
                             )
                         }
                     }

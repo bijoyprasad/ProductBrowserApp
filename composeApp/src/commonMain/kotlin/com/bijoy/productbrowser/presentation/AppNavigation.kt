@@ -20,13 +20,19 @@ fun AppNavigation() {
         startDestination = ProductListRoute
     ) {
         composable<ProductListRoute> {
-            ProductListScreen(navController = navController)
+            ProductListScreen(
+                onItemClick = { id ->
+                    navController.navigate(ProductDetailsRoute(id))
+                }
+            )
         }
         composable<ProductDetailsRoute> {
             val route = it.toRoute<ProductDetailsRoute>()
             ProductDetailScreen(
+                onBack = {
+                    navController.popBackStack()
+                },
                 productId = route.id,
-                navController = navController
             )
         }
     }

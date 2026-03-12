@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.bijoy.productbrowser.domain.model.Product
+import com.bijoy.productbrowser.presentation.util.toPrice
 import kotlin.math.roundToInt
 
 @Composable
@@ -39,35 +40,42 @@ fun ProductCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    OutlinedCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column {
             Box {
                 AsyncImage(
                     model = product.thumbnail,
                     contentDescription = product.title,
-                    contentScale = ContentScale.Crop,
+                    contentScale = ContentScale.FillBounds,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1.5f)
+                        .aspectRatio(1f)
                         .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                 )
-                if (product.discountPercentage > 0) {
-                    Badge(
+                Badge(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp),
+                    containerColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
                         modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(8.dp),
-                        containerColor = MaterialTheme.colorScheme.error
+                            .padding(4.dp)
                     ) {
+                        Text(text = "⭐", style = MaterialTheme.typography.bodySmall)
+                        Spacer(modifier = Modifier.width(2.dp))
                         Text(
-                            text = "-${product.discountPercentage.roundToInt()}%",
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                            text = product.rating.roundToInt().toString(),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
@@ -117,30 +125,25 @@ fun ProductCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
                         Text(
-                            text = product.discountedPrice.toString(),
+                            text = product.discountedPrice.toPrice(),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.error
                         )
+                        Spacer(modifier.width(4.dp))
                         if (product.discountPercentage > 0) {
                             Text(
-                                text = product.price.toString(),
+                                text = product.price.toPrice(),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = MaterialTheme.colorScheme.secondary,
                                 textDecoration = TextDecoration.LineThrough
                             )
                         }
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "⭐", style = MaterialTheme.typography.bodySmall)
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Text(
-                            text = product.rating.toString(),
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Medium
-                        )
                     }
                 }
             }
