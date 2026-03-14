@@ -52,7 +52,6 @@ fun CategoryFilterRow(
             onClick = { onCategorySelected(null) }
         )
 
-        // One chip per category
         categories.forEach { category ->
             CategoryChip(
                 label = category.capitalize(Locale.current),

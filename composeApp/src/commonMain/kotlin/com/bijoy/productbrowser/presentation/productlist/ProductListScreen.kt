@@ -63,7 +63,6 @@ fun ProductListScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // ── Search bar ───────────────────────────────────────────────
             SearchBar(
                 query = state.searchQuery,
                 onQueryChange = viewModel::onSearchQueryChange,
@@ -73,7 +72,6 @@ fun ProductListScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
-            // ── Category filter chips (hidden during initial load) ─────────
             AnimatedVisibility(
                 visible = !state.isLoading && state.availableCategories.isNotEmpty(),
                 enter = fadeIn(),
@@ -89,7 +87,6 @@ fun ProductListScreen(
                 )
             }
 
-            // ── Result count label (search active) ────────────────────────
             AnimatedVisibility(
                 visible = state.isSearchActive && state.displayedProducts.isNotEmpty(),
                 enter = fadeIn(),
@@ -105,21 +102,16 @@ fun ProductListScreen(
                 )
             }
 
-            // ── Content states ────────────────────────────────────────────
             when {
-                // Initial load spinner
                 state.isLoading -> LoadingView()
 
-                // API error (only when not searching)
                 state.error != null && !state.isSearchActive -> ErrorView(
                     message = state.error!!,
                     onRetry = viewModel::loadProducts
                 )
 
-                // Search in-flight spinner
                 state.isSearchLoading -> LoadingView()
 
-                // Search + optional category returned nothing
                 state.displayedProducts.isEmpty() && state.isSearchActive -> {
                     val msg = buildString {
                         append("No results for \"${state.searchQuery}\"")
@@ -128,14 +120,11 @@ fun ProductListScreen(
                     EmptyView(message = msg)
                 }
 
-                // Category filter alone returned nothing
                 state.displayedProducts.isEmpty() && state.selectedCategory != null ->
                     EmptyView(message = "No products in \"${state.selectedCategory}\"")
 
-                // Nothing loaded at all
                 state.displayedProducts.isEmpty() -> EmptyView()
 
-                // Happy path — staggered product grid
                 else -> {
                     LazyVerticalStaggeredGrid(
                         columns = StaggeredGridCells.Adaptive(160.dp),

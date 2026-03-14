@@ -34,8 +34,6 @@ class ProductListViewModel(
         observeSearchQuery()
     }
 
-    // ── Data loading ──────────────────────────────────────────────────────
-
     fun loadProducts() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
@@ -50,8 +48,6 @@ class ProductListViewModel(
             }
         }
     }
-
-    // ── Search ────────────────────────────────────────────────────────────
 
     private fun observeSearchQuery() {
         _searchQuery
@@ -99,10 +95,8 @@ class ProductListViewModel(
         }
     }
 
-    // ── Category filter (pure local, no API) ──────────────────────────────
 
     fun selectCategory(category: String) {
-        // Tapping the already-selected chip deselects it (toggle behaviour)
         _state.update {
             it.copy(selectedCategory = if (it.selectedCategory == category) null else category)
         }

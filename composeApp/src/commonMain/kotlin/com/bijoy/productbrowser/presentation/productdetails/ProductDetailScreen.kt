@@ -123,7 +123,6 @@ private fun ProductDetailContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        // Product Image
         Box{
             AsyncImage(
                 model = product.thumbnail,
@@ -164,7 +163,6 @@ private fun ProductDetailContent(
             }
         }
         Column(modifier = Modifier.padding(16.dp)) {
-            // Category & Brand
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -201,7 +199,6 @@ private fun ProductDetailContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Title
             Text(
                 text = product.title,
                 style = MaterialTheme.typography.headlineSmall,
@@ -218,7 +215,6 @@ private fun ProductDetailContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Price
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -253,7 +249,6 @@ private fun ProductDetailContent(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
-            // Description
             Text(
                 text = "Description",
                 style = MaterialTheme.typography.titleMedium,
@@ -267,7 +262,6 @@ private fun ProductDetailContent(
                 lineHeight = MaterialTheme.typography.bodyMedium.lineHeight
             )
 
-            // Tags
             if (product.tags.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -282,7 +276,6 @@ private fun ProductDetailContent(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
-            // Product Info Cards
             Text(
                 text = "Product Info",
                 style = MaterialTheme.typography.titleMedium,
@@ -306,7 +299,6 @@ private fun ProductDetailContent(
                 }
             }
 
-            // Reviews
             if (product.reviews.isNotEmpty()) {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
                 Text(
